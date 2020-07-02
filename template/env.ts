@@ -44,7 +44,7 @@ for (const k in defaults) {
   }
 }
 
-export default class configuration {
+export default class Configuration {
   API_ENDPOINT: string;
   PORT: number;
   AUTH_TOKEN: string | null;

@@ -1,8 +1,5 @@
+
 /* Handles conversion of API results to a standardized FHIR object */
-
-
-
-
 
 import { ResearchStudy } from './research-study';
 import { TrialScopeResponse, TrialScopeTrial } from './trialscope';
