@@ -4,7 +4,7 @@ import { Bundle, Condition } from './bundle';
 
 Retrieves api response as promise to be used in conversion to fhir ResearchStudy */
 import https from 'https';
-import { SearchResponse } from "./searchresponse";
+import { SearchResponse , APIError } from "./searchresponse";
 import Configuration from "./env";
 
 
@@ -118,7 +118,7 @@ export class APIQuery {
         if (resource.resourceType === 'Condition') {
           this.addCondition(resource);
         }
-        //TO-DO Extract any additional resources that are defined
+        //TO-DO Extract any additional resources that you defined
 
 
 
@@ -155,7 +155,7 @@ export class APIQuery {
  * @param reqBody The body of the request containing patient bundle data
  */
 
-function getResponse(reqBody) : Promise<SearchResponse> {
+export function getResponse(reqBody) : Promise<SearchResponse> {
 
     const patientBundle = (typeof reqBody.patientData === 'string' ? JSON.parse(reqBody.patientData) : reqBody.patientData) as Bundle;
     let query = (new APIQuery(patientBundle)).toQuery(); 
@@ -166,15 +166,15 @@ function getResponse(reqBody) : Promise<SearchResponse> {
 
 function sendQuery(query: string): Promise<SearchResponse> {
     return new Promise((resolve, reject) => {
-      const body = Buffer.from(`{"query":${JSON.stringify(query)}}`, 'utf8');
-      console.log('Running raw TrialScope query');
+      const body = Buffer.from(`{"query":${JSON.stringify(query)}}`, 'utf8'); 
+      console.log('Running raw query');
       console.log(query);
-      const request = https.request(environment.trialscope_endpoint, {
+      const request = https.request(environment.api_endpoint, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json; charset=UTF-8',
           'Content-Length': body.byteLength.toString(),
-          'Authorization': 'Bearer ' + environment.TRIALSCOPE_TOKEN
+          'Authorization': 'Bearer ' + environment.AUTH_TOKEN //Potentially needs to be modified ?
         }
       }, result => {
         let responseBody = '';
@@ -184,9 +184,9 @@ function sendQuery(query: string): Promise<SearchResponse> {
         result.on('end', () => {
           console.log('Complete');
           if (result.statusCode === 200) {
-            resolve(JSON.parse(responseBody));
+            resolve(new SearchResponse(JSON.parse(responseBody))); //change to constructor format
           } else {
-            reject(new TrialScopeError(`Server returned ${result.statusCode} ${result.statusMessage}`, result, responseBody));
+            reject(new APIError(`Server returned ${result.statusCode} ${result.statusMessage}`, result, responseBody));
           }
         });
       });

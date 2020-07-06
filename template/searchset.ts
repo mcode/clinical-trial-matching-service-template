@@ -3,6 +3,7 @@
 
 import { ResearchStudy } from './research-study';
 import { TrialScopeResponse, TrialScopeTrial } from './trialscope';
+import { SearchResponse } from './searchresponse';
 
 export interface SearchResult {
   mode: string;
@@ -23,7 +24,7 @@ export class SearchSet {
 
 
   
-  constructor(trials: TrialScopeResponse) {
+  constructor(trials: SearchResponse) {
     // TO-DO Access list of search results & total result count from object defined in searchresponse.ts
     this.total = trials.data.baseMatches.totalCount;
     let index = 0;

@@ -1,23 +1,6 @@
-import { TrialScopeTrial, ArmGroup, Site } from './trialscope';
+import { TrialObject, ArmGroup, Site } from './searchresponse';
 
-// Mappings between trialscope value sets and FHIR value sets
-const phaseCodeMap = new Map<string, string>();
-phaseCodeMap.set("Early Phase 1", "early-phase-1");
-phaseCodeMap.set("N/A", "n-a");
-phaseCodeMap.set("Phase 1", "phase-1");
-phaseCodeMap.set("Phase 1/Phase 2", "phase-1-phase-2");
-phaseCodeMap.set("Phase 2", "phase-2");
-phaseCodeMap.set("Phase 2/Phase 3", "phase-2-phase-3");
-phaseCodeMap.set("Phase 3", "phase-3");
-phaseCodeMap.set("Phase 4", "phase-4");
 
-const statusMap = new Map<string, string>();
-statusMap.set("Active, not recruiting", "closed-to-accrual");
-statusMap.set("Approved for marketing", "approved");
-statusMap.set("Available", "active");
-statusMap.set("Enrolling by invitation", "active");
-statusMap.set("Not yet recruiting", "approved");
-statusMap.set("Recruiting", "active");
 
 // FHIR data types supporting ResearchStudy
 export interface Identifier{
@@ -115,7 +98,7 @@ export class ResearchStudy {
   site?: Reference[];
   contained?: (Group | Location | Organization | Practitioner)[];
 
-  constructor(trial: TrialScopeTrial, id: number) {
+  constructor(trial: TrialObject, id: number) {
     this.id = String(id);
     if (trial.nctId) {
       this.identifier = [{use: "official", system: "http://clinicaltrials.gov", value: trial.nctId}];
@@ -123,11 +106,11 @@ export class ResearchStudy {
     if (trial.title) {
       this.title = trial.title;
     }
-    if (trial.overallStatus) {
-      this.status = this.convertStatus(trial.overallStatus);
+    if (trial.trialStatus) {
+      this.status = trial.trialStatus
     }
     if (trial.phase) {
-      this.phase = {coding: [{system: "http://terminology.hl7.org/CodeSystem/research-study-phase", code: this.convertPhaseCode(trial.phase), display: trial.phase}], text: trial.phase};
+      this.phase = {coding: [{system: "http://terminology.hl7.org/CodeSystem/research-study-phase", code: trial.phase, display: trial.phase}], text: trial.phase}; //may need to be fixed
     }
     if (trial.studyType) {
       this.category = [{text: trial.studyType}];
@@ -135,8 +118,8 @@ export class ResearchStudy {
     if (trial.conditions != "[]") {
       this.condition = this.convertStringArrayToCodeableConcept(trial.conditions);
     }
-    if (trial.overallContactName || trial.overallContactPhone || trial.overallContactEmail) {
-      this.contact = this.setContact(trial.overallContactName, trial.overallContactPhone, trial.overallContactEmail);
+    if (trial.contactInfo) {
+      this.contact = this.setContact(trial.contactInfo);
     }
     if (trial.keywords != "[]") {
       this.keyword = this.convertStringArrayToCodeableConcept(trial.keywords);
@@ -150,8 +133,8 @@ export class ResearchStudy {
     if (typeof trial.armGroups[Symbol.iterator] === 'function') { // ts returns {} when empty, which is not iterable
       this.arm = this.setArm(trial.armGroups);
     }
-    if (trial.officialTitle) {
-      this.objective = [{name: trial.officialTitle}];
+    if (trial.objective) {
+      this.objective = [{name: trial.objective}];
     }
     if (trial.criteria) {
       this.enrollment = [{reference: "#group" + this.id, type: "Group", display: trial.criteria}];
@@ -182,15 +165,6 @@ export class ResearchStudy {
     }
   }
 
-  convertStatus(tsStatus: string): string {
-    const fhirStatus = statusMap.get(tsStatus);
-    return fhirStatus;
-  }
-
-  convertPhaseCode(tsPhase: string): string {
-    const fhirPhaseCode = phaseCodeMap.get(tsPhase);
-    return fhirPhaseCode;
-  }
 
   convertStringArrayToCodeableConcept(tsConditions: string): CodeableConcept[] {
     const jsonConditions: string[] = JSON.parse(tsConditions) as string[];
@@ -201,18 +175,18 @@ export class ResearchStudy {
     return fhirConditions;
   }
 
-  setContact(name: string, phone: string, email: string): ContactDetail[] {
+  setContact(info: {name?: string; email?: string; phone?: string;}): ContactDetail[] {
     const contact: ContactDetail = {};
-    if (name) {
+    if (info.name) {
       contact.name = name;
     }
-    if (phone || email) {
+    if (info.phone || info.email) {
       const telecoms: Telecom[] = [];
-      if (phone) {
-        telecoms.push({system: "phone", value: phone, use: "work"});
+      if (info.phone) {
+        telecoms.push({system: "phone", value: info.phone, use: "work"});
       }
-      if (email) {
-        telecoms.push({system: "email", value: email, use: "work"});
+      if (info.email) {
+        telecoms.push({system: "email", value: info.email, use: "work"});
       }
       contact.telecom = telecoms;
     }
