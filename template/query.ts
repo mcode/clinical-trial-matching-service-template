@@ -1,80 +1,19 @@
-import { Bundle, Condition } from './bundle';
 
 /* Handles conversion of patient bundle data to a proper request for matching service apis.
 
 Retrieves api response as promise to be used in conversion to fhir ResearchStudy */
+
+import { Bundle, Condition } from './bundle';
 import https from 'https';
 import { SearchResponse , APIError } from "./searchresponse";
 import Configuration from "./env";
 
-
+//set environment variables
 const environment = new Configuration().defaultEnvObject();
 if (typeof environment.AUTH_TOKEN !== 'string' || environment.AUTH_TOKEN === '') {
     throw new Error('Authorization token is not set in environment. Please set AUTH_TOKEN to valid API token.');
 }
 
-
-
-/* Patient Bundles look like this:
-
-
-{
-	 "resourceType": "Bundle",
-	 "type": "collection",
-	 "entry": [
-		 {
-			 "resource": {
-				 "resourceType": "Parameters",
-				 "parameter": [
-					{
-						"name": "zipCode",
-						"valueString": "00000"
-					},
-					{
-						 "name": "travelRadius",
-						 "valueString": "10"
-					},
-					{
-						 "name": "phase",
-						 "valueString": "any"
-					},
-					{
-						 "name": "recruitmentStatus",
-						 "valueString": "all"
-					}
-				]
-			}
-		},
-		{
-			"resource": {
-				"resourceType": "Patient",
-				"id": "id1",
-				...
-			}
-		},
-		{
-			"resource": {
-				"resourceType": "Condition",
-				"id": "id2",
-				...
-			}
-		},
-		{
-			"resource": {
-				"resourceType": "Immunization",
-				"id": "id3",
-				...
-			}
-		},
-		{
-			"resource": {
-				"resourceType": "Encounter",
-				"id": "id4",
-				...
-			}
-		}]
-}
-*/
 
 /** TO-DO
  * Finish making an object for storing the various parameters necessary for the api query
@@ -184,7 +123,7 @@ function sendQuery(query: string): Promise<SearchResponse> {
         result.on('end', () => {
           console.log('Complete');
           if (result.statusCode === 200) {
-            resolve(new SearchResponse(JSON.parse(responseBody))); //change to constructor format
+            resolve(new SearchResponse(JSON.parse(responseBody))); 
           } else {
             reject(new APIError(`Server returned ${result.statusCode} ${result.statusMessage}`, result, responseBody));
           }

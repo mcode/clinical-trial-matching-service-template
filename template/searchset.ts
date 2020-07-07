@@ -1,9 +1,6 @@
-
-/* Handles conversion of API results to a standardized FHIR object */
-
+import { TrialObject, SearchResponse } from './searchresponse';
 import { ResearchStudy } from './research-study';
-import { TrialScopeResponse, TrialScopeTrial } from './trialscope';
-import { SearchResponse } from './searchresponse';
+/* Handles conversion of API results to a standardized FHIR object */
 
 export interface SearchResult {
   mode: string;
@@ -22,15 +19,12 @@ export class SearchSet {
   total: number;
   entry: SearchBundleEntry[] = [];
 
-
-  
-  constructor(trials: SearchResponse) {
+  constructor(response: SearchResponse) {
     // TO-DO Access list of search results & total result count from object defined in searchresponse.ts
-    this.total = trials.data.baseMatches.totalCount;
+    this.total = response.totalCount;
     let index = 0;
 
-    for (const node of trials.data.baseMatches.edges) {
-      const trial: TrialScopeTrial = node.node;
+    for (const trial of response.trials) {
       const study = new ResearchStudy(trial, index)
       this.entry.push({resource: study, search: {mode: "match", score: 1}});
       index++;

@@ -1,20 +1,8 @@
 
-
-
 /*The primary focus of this file is to define an object model matching that returned by the matching service API 
-
-It is critical this section be completed first, as the rest of the server will utilize this definition
-
-
-
 */
 
-
-import Configuration from "./env";
-
 import { IncomingMessage } from 'http';
-
-
 
 
 //API RESPONSE SECTION
@@ -23,7 +11,6 @@ export class APIError extends Error {
       super(message);
     }
 }
-
 
 //TO-DO create class which reflects the json object passed back from the api
 //Includes trial objects as well as additional headers/metadata
@@ -52,7 +39,7 @@ export class SearchResponse {
     }
 
 }
-
+//TO-DO define dictionaries to map API returned values to enum values 
 enum Status {
 
     closed = "closed-to-accrual",
@@ -75,41 +62,47 @@ enum Phase {
     phase4 = "phase-4",
 
 }
+
+export interface ArmGroup {
+    description?: string;
+    arm_group_type?: string;
+    arm_group_label?: string;
+  }
+  
+export interface Site {
+    facility?: string;
+    contactName?: string;
+    contactEmail?: string;
+    contactPhone?: string;
+    latitude?: number;
+    longitude?: number;
+  }
+
 //TO-DO Update the object constructor to set the fields  with values from JSON if applicable
 export class TrialObject {
 
-    
-
-    //These paramaters are fairly standard among most clinical trials-- set as many as possible
+    //These paramaters are fairly standard among most clinical trials-- set as many as possible in the constructor
     rawTrial: JSON;
     nctId?: string; 
     title?: string;
     trialStatus?: Status; //must be set to correct enum
     phase?: Phase; //must be a valid enum
     studyType?: string; // i.e observational, interventional , randomization method ... 
-    
     conditions?: string; //leave as continuous string i.e. `{breast cancer, depression, diabetes , ...}`
     keywords?: string;  //leave as continuous string i.e. `{estrogen receptor-positive breast cancer, stage IIIB breast cancer, ... }`
     countries?: string; //leave as continuous string i.e. `{America, France, ... }`
     contactInfo?: {name?: string, email?: string, phone?: string};
     detailedDescription?: string;
     objective?: string; //goal of the study 
-    criteria?: string;
-    sponsor?: string;
-
-    
+    criteria?: string; //enrollment criteria 
+    sponsor?: string; //sponsor name
     armGroups?: ArmGroup[];
-   
-   
-    overallOfficialName?: string;
+    overallOfficialName?: string; 
     sites?: Site[];
 
     //TO-DO
     constructor(trial: JSON){
         this.rawTrial=trial;
-
-
-
 
     }
 }
