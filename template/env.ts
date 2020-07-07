@@ -1,6 +1,7 @@
-/*This file will establish the presets for the server such as its port, matching service endpoint, and authorization 
+/**
+ * This file will establish the presets for the server such as its port, matching service endpoint, and authorization 
+ */
 
-*/
 import fs from 'fs';
 import path from 'path';
 
@@ -11,7 +12,7 @@ const defaults: {[key: string]: string | null} = {
 };
 
 
-//********* Potentially trialscope specific code ********
+//* Potentially trialscope specific code *
 
 try {
   // Sadly there is no good way to *synchronously* read lines from a file and

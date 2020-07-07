@@ -1,7 +1,8 @@
 
-/* Handles conversion of patient bundle data to a proper request for matching service apis.
-
-Retrieves api response as promise to be used in conversion to fhir ResearchStudy */
+/**
+ * Handles conversion of patient bundle data to a proper request for matching service apis.
+ * Retrieves api response as promise to be used in conversion to fhir ResearchStudy 
+ */
 
 import { Bundle, Condition } from './bundle';
 import https from 'https';
@@ -27,9 +28,8 @@ export class APIQuery {
     phase = 'any';
     recruitmentStatus = 'all';
 
-    /*TO-DO Add any additional fields which need to be extracted from the bundle to construct query
-    */
-
+     // TO-DO Add any additional fields which need to be extracted from the bundle to construct query
+    
     constructor(patientBundle: Bundle) {
       for (const entry of patientBundle.entry) {
         if (!('resource' in entry)) {
@@ -71,8 +71,8 @@ export class APIQuery {
       }
     }
 
-
     //TO-DO Utilize the extracted information to create the API query
+
     /** 
      * Create an api request string
      * @return {string} the api query
@@ -87,8 +87,6 @@ export class APIQuery {
     }
   }
   
- 
-
 
 /** Converts patient Bundle (stored within request to server) --> Promise < searchresponse>
  * @param reqBody The body of the request containing patient bundle data
@@ -100,8 +98,6 @@ export function getResponse(reqBody) : Promise<SearchResponse> {
     let query = (new APIQuery(patientBundle)).toQuery(); 
     return sendQuery(query); 
 }
-
-
 
 function sendQuery(query: string): Promise<SearchResponse> {
     return new Promise((resolve, reject) => {

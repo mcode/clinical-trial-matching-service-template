@@ -1,6 +1,8 @@
 
-/*The primary focus of this file is to define an object model matching that returned by the matching service API 
-*/
+/**
+ * The primary focus of this file is to define an object model matching that returned by the matching service API 
+ */
+
 
 import { IncomingMessage } from 'http';
 
@@ -12,8 +14,10 @@ export class APIError extends Error {
     }
 }
 
-//TO-DO create class which reflects the json object passed back from the api
-//Includes trial objects as well as additional headers/metadata
+/**
+ * TO-DO create class which reflects the json object passed back from the api
+ * Includes trial objects as well as additional headers/metadata
+*/
 export class SearchResponse {
     rawJSON : JSON; //raw response from the matching service 
     totalCount?: number;
@@ -25,7 +29,9 @@ export class SearchResponse {
 
         this.rawJSON =response;
 
-        /*TO-DO Create array of trials
+    /** 
+     * TO-DO Create array of trials
+        
         Ex: 
         let count=0;
         for (const trial in rawJSON.trials){
@@ -35,11 +41,11 @@ export class SearchResponse {
         }
         totalCount =count;
 
-        */
+    */
     }
 
 }
-//TO-DO define dictionaries to map API returned values to enum values 
+//TO-DO define dictionaries to map API returned values to the following enum values if necessary
 enum Status {
 
     closed = "closed-to-accrual",
