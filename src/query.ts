@@ -92,9 +92,7 @@ export class APIQuery {
  * @param reqBody The body of the request containing patient bundle data
  */
 
-export function getResponse(reqBody) : Promise<SearchResponse> {
-
-    const patientBundle = (typeof reqBody.patientData === 'string' ? JSON.parse(reqBody.patientData) : reqBody.patientData) as Bundle;
+export function getResponse(patientBundle: Bundle) : Promise<SearchResponse> {
     let query = (new APIQuery(patientBundle)).toQuery(); 
     return sendQuery(query); 
 }
