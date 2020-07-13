@@ -19,13 +19,6 @@ describe("server tests", () => {
       });
   });
 
-  it("responds to /getConditions ", () => {
-    return request(server)
-      .post('/getConditions')
-      .set('Accept', 'application/json')
-      .expect(200);
-  });
-
   it("responds to /getClinicalTrial with improper patient bundle ", () => {
     return request(server)
       .post('/getClinicalTrial')
