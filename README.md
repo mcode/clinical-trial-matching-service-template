@@ -18,4 +18,23 @@ These steps give an overview of steps you need to take to get the template into 
     - Complete the _APIQuery_ class 
         * Learn more about patient bundle formatting on the [wiki](https://github.com/mcode/clinical-trial-matching-engine/wiki/Data-Model). 
         * Complete the **toQuery()** function which formats the request body sent to the matching service API. 
+4. Download and unzip folder of trials from (https://clinicaltrials.gov/ct2/resources/download#DownloadAllData) and place it in the src folder. Name it 'AllPublicXML'
 
+
+# Requirements
+
+The ResearchStudy object passed back by this server must be [FHIR-compliant] (https://www.hl7.org/fhir/researchstudy.html) and satisfy several requirements. 
+Study must contain: 
+- Title 
+- Summary 
+- Site location
+- Phase 
+- Contact Information i.e. sponsor email, phone number
+- Study Type 
+- Inclusion/ Exclusion criteria
+
+Note: _research-study.ts_ provides a "backup" system for filling in information missing from the object passed back from the matching service. This system fills in the following based on the trial's NctId:
+- Inclusion/Exclusion Criteria
+- Phase 
+- Study Type 
+- Trial Summary 

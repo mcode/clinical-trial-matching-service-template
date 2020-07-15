@@ -78,7 +78,7 @@ export class APIQuery {
      * @return {string} the api query
      */
     toQuery(): string {
-      let query = ` {}`;
+      const query = ` {}`;
       return query;
     }
 
@@ -93,7 +93,7 @@ export class APIQuery {
  */
 
 export function getResponse(patientBundle: Bundle) : Promise<SearchResponse> {
-    let query = (new APIQuery(patientBundle)).toQuery(); 
+    const query = (new APIQuery(patientBundle)).toQuery(); 
     return sendQuery(query); 
 }
 
