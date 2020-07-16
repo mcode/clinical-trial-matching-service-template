@@ -1,13 +1,20 @@
 
 /**
  * Handles conversion of patient bundle data to a proper request for matching service apis.
- * Retrieves api response as promise to be used in conversion to fhir ResearchStudy 
+ * Retrieves api response as promise to be used in conversion to fhir ResearchStudy
  */
 
 import { Bundle, Condition } from './bundle';
 import https from 'https';
-import { SearchResponse , APIError } from "./searchresponse";
+import { IncomingMessage } from 'http';
 import Configuration from "./env";
+
+//API RESPONSE SECTION
+export class APIError extends Error {
+    constructor(message: string, public result: IncomingMessage, public body: string) {
+      super(message);
+    }
+}
 
 //set environment variables
 const environment = new Configuration().defaultEnvObject();
@@ -29,7 +36,7 @@ export class APIQuery {
     recruitmentStatus = 'all';
 
      // TO-DO Add any additional fields which need to be extracted from the bundle to construct query
-    
+
     constructor(patientBundle: Bundle) {
       for (const entry of patientBundle.entry) {
         if (!('resource' in entry)) {
@@ -73,7 +80,7 @@ export class APIQuery {
 
     //TO-DO Utilize the extracted information to create the API query
 
-    /** 
+    /**
      * Create an api request string
      * @return {string} the api query
      */
@@ -86,20 +93,20 @@ export class APIQuery {
       return this.toQuery();
     }
   }
-  
 
-/** Converts patient Bundle (stored within request to server) --> Promise < searchresponse>
+
+/** Converts patient Bundle (stored within request to server) --> Promise < JSON>
  * @param reqBody The body of the request containing patient bundle data
  */
 
-export function getResponse(patientBundle: Bundle) : Promise<SearchResponse> {
-    const query = (new APIQuery(patientBundle)).toQuery(); 
-    return sendQuery(query); 
+export function getResponse(patientBundle: Bundle) : Promise<JSON> {
+    const query = (new APIQuery(patientBundle)).toQuery();
+    return sendQuery(query);
 }
 
-function sendQuery(query: string): Promise<SearchResponse> {
+function sendQuery(query: string): Promise<JSON> {
     return new Promise((resolve, reject) => {
-      const body = Buffer.from(`{"query":${JSON.stringify(query)}}`, 'utf8'); 
+      const body = Buffer.from(`{"query":${JSON.stringify(query)}}`, 'utf8');
       console.log('Running raw query');
       console.log(query);
       const request = https.request(environment.api_endpoint, {
@@ -117,15 +124,15 @@ function sendQuery(query: string): Promise<SearchResponse> {
         result.on('end', () => {
           console.log('Complete');
           if (result.statusCode === 200) {
-            resolve(new SearchResponse(JSON.parse(responseBody))); 
+            resolve(JSON.parse(responseBody));
           } else {
             reject(new APIError(`Server returned ${result.statusCode} ${result.statusMessage}`, result, responseBody));
           }
         });
       });
-  
+
       request.on('error', error => reject(error));
-  
+
       request.write(body);
       request.end();
     });

@@ -1,6 +1,10 @@
-import { TrialObject, SearchResponse } from './searchresponse';
 import { ResearchStudy } from './research-study';
-/* Handles conversion of API results to a standardized FHIR object */
+
+/* Handles conversion of API results to a standardized FHIR object
+This file contains a basic implementation of a FHIR Bundle (of type searchset)
+The class can be expanded meeting the specifications outlined at https://www.hl7.org/fhir/bundle.html
+For further specification on the FHIR SearchSet specifically : https://www.hl7.org/fhir/bundle.html#searchset
+*/
 
 export interface SearchResult {
   mode: string;
@@ -13,20 +17,21 @@ export interface SearchBundleEntry {
 }
 
 export class SearchSet {
-  // static attributes
   resourceType = 'Bundle';
   type = 'searchset';
   total: number;
   entry: SearchBundleEntry[] = [];
 
-  constructor(response: SearchResponse) {
-    // TO-DO Access list of search results & total result count from object defined in searchresponse.ts
-    this.total = response.totalCount;
+  constructor(response: JSON) {
+    this.total = 0; // TO-DO: Set the total number of trials returned by the match service
+    const trials = []; // TO-DO: Create an iterable version of the trials returned from the raw JSON of the match service (if necessary)
     let index = 0;
 
-    for (const trial of response.trials) {
-      const study = new ResearchStudy(trial, index)
-      this.entry.push({resource: study, search: {mode: "match", score: 1}});
+    for (const trial of trials) {
+      const study = new ResearchStudy(trial, index); // TO DO: Implement the ResearchStudy constructor in research-study.ts
+      const searchResult: SearchResult = {mode: "match", score: 1}; // TO-DO: Set the score for each trial
+      // If the trial does not have a match score, do not include the "search" parameter in the following line
+      this.entry.push({resource: study, search: searchResult});
       index++;
     }
 
