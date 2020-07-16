@@ -70,29 +70,29 @@ export interface TrialBackup
   }
 }
 
-export getBackupTrial(nctId: string) : trialBackup {
+export function getBackupTrial(nctId: string) : TrialBackup {
   const filePath = `./AllPublicXML/${nctId.substr(0, 7)}xxxx/${nctId}.xml`;
-  const data =fs.readFileSync(filePath, {encoding: 'utf8'});
-  const json : trialBackup= JSON.parse(parser.toJson(data)) as trialBackup;
+  const data = fs.readFileSync(filePath, {encoding: 'utf8'});
+  const json : TrialBackup= JSON.parse(parser.toJson(data)) as TrialBackup;
   return json;
 }
 
-export getBackupCriteria(trial: trialBackup) {
+export function getBackupCriteria(trial: TrialBackup) {
   const criteria :string = trial.clinical_study.eligibility.criteria.textblock;
   return criteria;
 }
 
-export getBackupSummary(trial: trialBackup) {
+export function getBackupSummary(trial: TrialBackup) {
   const summary:string = trial.clinical_study.brief_summary.textblock;
   return summary;
 }
 
-export getBackupPhase(trial: trialBackup) {
+export function getBackupPhase(trial: TrialBackup) {
   const phase:string  = trial.clinical_study.phase;
   return phase;
 }
 
-export getBackupStudyType(trial: trialBackup) {
+export function getBackupStudyType(trial: TrialBackup) {
   const studytype:string  = trial.clinical_study.study_type;
   return studytype;
  }

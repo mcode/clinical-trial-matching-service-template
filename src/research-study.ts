@@ -1,4 +1,4 @@
-import * from './trialbackup';
+import * as trialbackup from './trialbackup';
 
 /*
 This file contains a basic implementation of a FHIR ResearchStudy resource and supporting interfaces
