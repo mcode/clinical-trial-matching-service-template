@@ -20,7 +20,7 @@ These steps give an overview of steps you need to take to get the template into 
     - Complete the _APIQuery_ class 
         * Learn more about patient bundle formatting on the [wiki](https://github.com/mcode/clinical-trial-matching-engine/wiki/Data-Model). 
         * Complete the **toQuery()** function which formats the request body sent to the matching service API. 
-. Download and unzip folder of trials from (https://clinicaltrials.gov/ct2/resources/download#DownloadAllData) and place it in the src folder. Name it 'AllPublicXML'
+5. Download and unzip folder of trials from (https://clinicaltrials.gov/ct2/resources/download#DownloadAllData) and place it in the src folder. Name it 'AllPublicXML'
 
 
 # Requirements
