@@ -39,4 +39,10 @@ Note: _research-study.ts_ provides a "backup" system for filling in information 
 - Inclusion/Exclusion Criteria
 - Phase 
 - Study Type 
-- Trial Summary 
+- Trial Summary
+
+# Running the Server
+1. Run `npm install`
+2. Run `npm run-script build`
+3. Run `npm start`
+4. The service will now be running at http://localhost:3000/
