@@ -3,7 +3,7 @@ import * as parser from 'xml2json';
 
 /*
 This file contains a backup system for finding necessary trial information if your matching service does not provide it:
-  Using the given trial's nctId, use getBackupTrial to retrieve the trial's info from a local data store (insert filename)
+  Using the given trial's nctId, use getBackupTrial to retrieve the trial's info from a local data store within AllPublicXML
   Use the rest of the getBackup functions to retrieve the missing information in question
 */
 

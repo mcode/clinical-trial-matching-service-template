@@ -4,7 +4,7 @@ import * as trialbackup from './trialbackup';
 This file contains a basic implementation of a FHIR ResearchStudy resource and supporting interfaces
 The class can be expanded meeting the specifications outlined at https://www.hl7.org/fhir/researchstudy.html
 Should your matching service not provide a necessary attribute, use trialbackup.ts fill it in, if there is nothing to
-full in from the backup, leave the attribute out of your FHIR ResearchStudy entirely
+pull in from the backup, leave the attribute out of your FHIR ResearchStudy entirely
 */
 
 // FHIR data types supporting ResearchStudy
@@ -82,13 +82,13 @@ export interface HumanName {
 }
 
 // ResearchStudy implementation
-export class ResearchStudy { // still needs parameter specific notes for UI requirements
+export class ResearchStudy {
   resourceType = 'ResearchStudy';
   id?: string;
   identifier?: Identifier[];
   title?: string;
-  status?: string;
-  phase?: CodeableConcept; //
+  status?: string; // Use values from this coding system: http://hl7.org/fhir/research-study-status
+  phase?: CodeableConcept; // Use values from this coding system: http://terminology.hl7.org/CodeSystem/research-study-phase
   category?: CodeableConcept[];
   condition?: CodeableConcept[];
   contact?: ContactDetail[];
@@ -97,11 +97,15 @@ export class ResearchStudy { // still needs parameter specific notes for UI requ
   description?: string; // Should actually be markdown
   arm?: Arm[];
   objective?: Objective[];
-  enrollment?: Reference[];
-  sponsor?: Reference;
-  principalInvestigator?: Reference;
-  site?: Reference[];
-  contained?: (Group | Location | Organization | Practitioner)[]; //
+  enrollment?: Reference[]; // reference to a list of Group resource(s) (trial inclusion/exclusion criteria)
+  sponsor?: Reference; // reference to an Organization resource
+  principalInvestigator?: Reference; // reference to a Practitioner resource
+  site?: Reference[]; // reference to a Location Resource
+  contained?: (Group | Location | Organization | Practitioner)[]; // List of referenced resources
+  // Details on Contained: https://www.hl7.org/fhir/domainresource-definitions.html#DomainResource.contained
+  // Details on Reference: https://www.hl7.org/fhir/references.html#Reference
+  // Note: If the trial criteria is a text blob that cannot be mapped to characteristics in a Group resource,
+  // it can be stored in the display attribute of the Reference instead
 
   constructor(trial, id: number) {
 
