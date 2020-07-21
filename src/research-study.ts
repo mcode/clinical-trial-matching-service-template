@@ -123,7 +123,7 @@ export class ResearchStudy {
     to find the required information.
     Write your constructor such that if the information cannot be found the response from your match service or in the
     trialbackup system, the parameter is left out of the ResearchStudy object entirely
-    An sample filled out ResearchStudy constructor (build for TrialScope) can be found here:
+    A sample filled out ResearchStudy constructor (build for TrialScope) can be found here:
     https://github.com/mcode/clinical-trial-matching-service/blob/master/src/research-study.ts
     */
 
