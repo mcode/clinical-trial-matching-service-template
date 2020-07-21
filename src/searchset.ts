@@ -29,7 +29,7 @@ export class SearchSet {
 
     for (const trial of trials) {
       const study = new ResearchStudy(trial, index); // TO DO: Implement the ResearchStudy constructor in research-study.ts
-      const searchResult: SearchResult = {mode: "match", score: 1}; // TO-DO: Set the score for each trial (0 for "No Match", 0.5 for "Possible Match", 1 for "Likely Match")
+      const searchResult: SearchResult = {mode: "match", score: 1}; // TO-DO: Set the score (0-1) for each trial (< 0.33 for "No Match", else < 0.67 for "Possible Match", else "Likely Match")
       // If the trial does not have a match score, do not include the "search" parameter in the following line
       this.entry.push({resource: study, search: searchResult});
       index++;
