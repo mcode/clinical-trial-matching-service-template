@@ -22,14 +22,14 @@ export class SearchSet {
   total: number;
   entry: SearchBundleEntry[] = [];
 
-  constructor(response: JSON) {
+  constructor(response: any) {
     this.total = 0; // TO-DO: Set the total number of trials returned by the match service
     const trials = []; // TO-DO: Create an iterable version of the trials returned from the raw JSON of the match service (if necessary)
     let index = 0;
 
     for (const trial of trials) {
       const study = new ResearchStudy(trial, index); // TO DO: Implement the ResearchStudy constructor in research-study.ts
-      const searchResult: SearchResult = {mode: "match", score: 1}; // TO-DO: Set the score for each trial
+      const searchResult: SearchResult = {mode: "match", score: 1}; // TO-DO: Set the score for each trial (0 for "No Match", 0.5 for "Possible Match", 1 for "Likely Match")
       // If the trial does not have a match score, do not include the "search" parameter in the following line
       this.entry.push({resource: study, search: searchResult});
       index++;
