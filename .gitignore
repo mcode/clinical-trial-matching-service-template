@@ -5,7 +5,7 @@
 
 # Ignore installed modules
 /node_modules
-spec/tmp/org.hl7.fhir.validator.jar
+spec/data/org.hl7.fhir.validator.jar
 /src/AllPublicXML
 # System Files
 .DS_Store
