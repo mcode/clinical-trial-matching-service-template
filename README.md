@@ -16,6 +16,7 @@ These steps give an overview of steps you need to take to get the template into 
     - Complete the constructors for the _ResearchStudy_ classes
         * Extract as many paramaters as possible from the JSON while adhering to the spec
     - Ensure this part is completed as it used in the rest of the server 
+    - For testing and validation, make sure to save off an example result from the match API to **trial_object.json**. There are unit tests that will validate the ResearchStudy bundle that has been created by filling in the constructors above.
 4. Open **query.ts**
     - Complete the _APIQuery_ class 
         * Learn more about patient bundle formatting on the [wiki](https://github.com/mcode/clinical-trial-matching-engine/wiki/Data-Model). 
