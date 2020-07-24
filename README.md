@@ -12,7 +12,7 @@ These steps give an overview of steps you need to take to get the template into 
     - Create a file in the project directory named **.env.local** and enter the following: AUTH_TOKEN = **_insert authorization token_** 
 2. Open up **searchset.ts**. This is one of two files that turns the response from the match API into a FHIR Bundle.
     - Fill in the TO-DOs in the _SearchSet_ constructor
-3. Open up **research-study.ts**. This is the other file that turns the response from the match API into a FHIR Bundle. This FHIR maps a trial from the match API to a FHIR ResearchStudy.
+3. Open up **research-study.ts**. This is the other file that turns the response from the match API into a FHIR Bundle. This file maps a trial from the match API to a FHIR ResearchStudy.
     - Complete the constructors for the _ResearchStudy_ classes
         * Extract as many paramaters as possible from the JSON while adhering to the spec
     - Ensure this part is completed as it used in the rest of the server 
