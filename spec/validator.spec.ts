@@ -43,7 +43,7 @@ describe('FHIR Validator jar', () => {
     );
   });
 
-  it('validates trialscope -> research study object', function (done) {
+  it('validates matching service results -> research study object', function (done) {
     const data = fs.readFileSync('./spec/data/trial_object.json', { encoding: 'utf8' });
     const json = JSON.parse(data);
     const study = new ResearchStudy(json, 1);
