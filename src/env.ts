@@ -12,8 +12,6 @@ const defaults: {[key: string]: string | null} = {
 };
 
 
-//* Potentially trialscope specific code *
-
 try {
   // Sadly there is no good way to *synchronously* read lines from a file and
   // Node provides no way to make a module load wait on a Promise.

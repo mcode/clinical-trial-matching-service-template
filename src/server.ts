@@ -55,18 +55,7 @@ app.post('/getClinicalTrial', function (req, res) {
     } else {
       res.status(400).send({ error: 'Invalid patientBundle' });
     }
-  } /* no support for raw searchBody now
-  else if ('inputParam' in postBody) {
-    // Backwards-compat: if there is no patient body, just run the query directly
-    runRawTrialScopeQuery(postBody.inputParam as string).then(result => {
-      res.status(200).send(result);
-    }).catch(error => {
-      console.error(error);
-      res.status(400).send({ error: (error as Error).toString() });
-    });
-    return;
-    
-  } */
+  } 
   else {
     // request missing json fields
     res.status(400).send({ error: 'Request missing required fields' });
