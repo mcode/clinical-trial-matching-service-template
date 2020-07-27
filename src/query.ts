@@ -5,7 +5,7 @@
 import https from 'https';
 import { IncomingMessage } from 'http';
 import Configuration from "./env";
-import { Bundle, ResearchStudy, SearchSet } from 'clinical-trial-matching-service';
+import { Bundle, Condition, ResearchStudy, SearchSet } from 'clinical-trial-matching-service';
 
 // Generic type that represents a JSON object - that is, an object parsed from
 // JSON. Note that JSON.parse is an any, this does not represent that.
@@ -39,7 +39,7 @@ export class APIQuery {
 
      // TO-DO Add any additional fields which need to be extracted from the bundle to construct query
 
-    constructor(patientBundle: Bundle.Bundle) {
+    constructor(patientBundle: Bundle) {
       for (const entry of patientBundle.entry) {
         if (!('resource' in entry)) {
           // Skip bad entries
@@ -69,7 +69,7 @@ export class APIQuery {
         // TO-DO Extract any additional resources that you defined
       }
     }
-    addCondition(condition: Bundle.Condition): void {
+    addCondition(condition: Condition): void {
       // Should have a code
       // TODO: Limit to specific coding systems (maybe)
       for (const code of condition.code.coding) {
@@ -98,7 +98,7 @@ export class APIQuery {
  * @param reqBody The body of the request containing patient bundle data
  */
 
-export function getResponse(patientBundle: Bundle.Bundle): Promise<SearchSet> {
+export function getResponse(patientBundle: Bundle): Promise<SearchSet> {
   return sendQuery((new APIQuery(patientBundle)).toQuery());
 }
 
