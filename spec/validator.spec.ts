@@ -1,4 +1,4 @@
-import { ResearchStudy } from '../src/research-study';
+import { convertToResearchStudy } from '../src/query';
 
 /*
  * Use the FHIR validator jar to check the ResearchStudy bundle being sent to
@@ -16,7 +16,7 @@ import { ResearchStudy } from '../src/research-study';
  * being made properly.
  */
 import { exec } from 'child_process';
-import * as fs from 'fs';
+import fs from 'fs';
 
 // NOTE: The jar file must be named org.hl7.fhir.validator.jar
 
@@ -45,8 +45,11 @@ describe('FHIR Validator jar', () => {
 
   it('validates matching service results -> research study object', function (done) {
     const data = fs.readFileSync('./spec/data/trial_object.json', { encoding: 'utf8' });
-    const json = JSON.parse(data);
-    const study = new ResearchStudy(json, 1);
+    const json = JSON.parse(data) as unknown;
+    if (typeof json !== 'object') {
+      throw new Error('Invalid data in ./spec/data/trial_object.json');
+    }
+    const study = convertToResearchStudy(json as Record<string, unknown>, 1);
     fs.writeFileSync('./spec/data/converted.json', JSON.stringify(study));
     const child = exec(
       'java -jar ./spec/data/org.hl7.fhir.validator.jar ./spec/data/converted.json',
