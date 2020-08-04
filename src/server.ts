@@ -1,7 +1,9 @@
 // This stub handles starting the server.
 
-import { getResponse } from './query';
-import { ClinicalTrialMatchingService } from 'clinical-trial-matching-service';
+import createClinicalTrialLookup from './query';
+import ClinicalTrialMatchingService, { configFromEnv } from 'clinical-trial-matching-service';
 
-const service = new ClinicalTrialMatchingService(getResponse);
+const configuration = configFromEnv('MATCHING_SERVICE_');
+const getMatchingClinicalTrials = createClinicalTrialLookup(configuration);
+const service = new ClinicalTrialMatchingService(getMatchingClinicalTrials, configuration);
 service.listen();

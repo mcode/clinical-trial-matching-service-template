@@ -1,4 +1,5 @@
-import { convertToResearchStudy } from '../src/query';
+import { QueryTrial } from '../src/query';
+import { convertToResearchStudy } from '../src/researchstudy-mapping';
 
 /*
  * Use the FHIR validator jar to check the ResearchStudy bundle being sent to
@@ -49,7 +50,7 @@ describe('FHIR Validator jar', () => {
     if (typeof json !== 'object') {
       throw new Error('Invalid data in ./spec/data/trial_object.json');
     }
-    const study = convertToResearchStudy(json as Record<string, unknown>, 1);
+    const study = convertToResearchStudy(json as QueryTrial, 1);
     fs.writeFileSync('./spec/data/converted.json', JSON.stringify(study));
     const child = exec(
       'java -jar ./spec/data/org.hl7.fhir.validator.jar ./spec/data/converted.json',

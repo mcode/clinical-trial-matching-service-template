@@ -8,11 +8,11 @@
     "url": "https://github.com/mcode/clinical-trial-matching-service-template.git"
   },
   "scripts": {
-    "build": "npm run build-ts",
-    "build-ts": "tsc",
+    "build": "npm run-script build:ts",
+    "build:ts": "tsc",
     "lint": "eslint . --ext .js,.ts",
     "serve": "node dist/server.js",
-    "start": "npm run serve",
+    "start": "npm run-script build:ts && npm run-script serve",
     "test": "ts-node node_modules/jasmine/bin/jasmine"
   },
   "author": "",

@@ -4,150 +4,233 @@
  */
 import https from 'https';
 import { IncomingMessage } from 'http';
-import Configuration from "./env";
-import { Bundle, Condition, ResearchStudy, SearchSet } from 'clinical-trial-matching-service';
+import { Bundle, ServiceConfiguration, Condition, ResearchStudy, SearchSet } from 'clinical-trial-matching-service';
+import convertToResearchStudy from './researchstudy-mapping';
+
+export interface QueryConfiguration extends ServiceConfiguration {
+  endpoint?: string;
+  auth_token?: string;
+}
+
+/**
+ * Create a new matching function using the given configuration.
+ * @param configuration the configuration to use to configure the matcher
+ */
+export function createClinicalTrialLookup(configuration: QueryConfiguration): (patientBundle: Bundle) => Promise<SearchSet> {
+  // Raise errors on missing configuration
+  if (typeof configuration.endpoint !== 'string') {
+    throw new Error('Missing endpoint in configuration');
+  }
+  if (typeof configuration.auth_token !== 'string') {
+    throw new Error('Missing auth_token in configuration');
+  }
+  const endpoint = configuration.endpoint;
+  const bearerToken = configuration.auth_token;
+  return function getMatchingClinicalTrials(patientBundle: Bundle): Promise<SearchSet> {
+    // Create the query based on the patient bundle:
+    const query = new APIQuery(patientBundle);
+    // And send the query to the server
+    return sendQuery(endpoint, query, bearerToken);
+  };
+}
+
+export default createClinicalTrialLookup;
+
+// Generic type for the request data being sent to the server. Fill this out
+// with a more complete type.
+type QueryRequest = string;
+
+/**
+ * Generic type for the trials returned.
+ *
+ * TO-DO: Fill this out to match your implementation
+ */
+export interface QueryTrial extends Record<string, unknown> {
+  name: string;
+}
+
+/**
+ * Type guard to determine if an object is a valid QueryTrial.
+ * @param o the object to determine if it is a QueryTrial
+ */
+export function isQueryTrial(o: unknown): o is QueryTrial {
+  if (typeof o !== 'object' || o === null) return false;
+  // TO-DO: Make this match your format.
+  return typeof (o as QueryTrial).name === 'string';
+}
+
+// Generic type for the response data being received from the server.
+interface QueryResponse extends Record<string, unknown> {
+  matchingTrials: QueryTrial[];
+}
+
+/**
+ * Type guard to determine if an object is a valid QueryResponse.
+ * @param o the object to determine if it is a QueryResponse
+ */
+function isQueryResponse(o: unknown): o is QueryResponse {
+  if (typeof o !== 'object' || o === null) return false;
+  // TO-DO: Check the actual instances and ensure they're valid
+  return Array.isArray((o as QueryResponse).matchingTrials);
+}
+
+interface QueryErrorResponse extends Record<string, unknown> {
+  error: string;
+}
+
+/**
+ * Type guard to determine if an object is a QueryErrorResponse.
+ * @param o the object to determine if it is a QueryErrorResponse
+ */
+function isQueryErrorResponse(o: unknown): o is QueryErrorResponse {
+  if (typeof o !== 'object' || o === null) return false;
+  return typeof (o as QueryErrorResponse).error === 'string';
+}
 
 // Generic type that represents a JSON object - that is, an object parsed from
-// JSON. Note that JSON.parse is an any, this does not represent that.
+// JSON. Note that the return value from JSON.parse is an any, this does not
+// represent that.
 type JsonObject = Record<string, unknown>;
 
-//API RESPONSE SECTION
+// API RESPONSE SECTION
 export class APIError extends Error {
-    constructor(message: string, public result: IncomingMessage, public body: string) {
-      super(message);
-    }
+  constructor(message: string, public result: IncomingMessage, public body: string) {
+    super(message);
+  }
 }
 
-//set environment variables
-const environment = new Configuration().defaultEnvObject();
-if (typeof environment.AUTH_TOKEN !== 'string' || environment.AUTH_TOKEN === '') {
-    throw new Error('Authorization token is not set in environment. Please set AUTH_TOKEN to valid API token.');
-}
-
-
-/** TO-DO
+/**
+ * This class represents a query, built based on values from within the patient
+ * bundle.
+ * TO-DO
  * Finish making an object for storing the various parameters necessary for the api query
  * based on a patient bundle.
  * Reference https://github.com/mcode/clinical-trial-matching-engine/wiki to see patientBundle Structures
  */
 export class APIQuery {
-    conditions = new Set<string>();
-    zipCode?: string = null;
-    travelRadius?: number = null;
-    phase = 'any';
-    recruitmentStatus = 'all';
+  // The following example fields are defined by default within the matching UI
+  /**
+   * US zip code
+   */
+  zipCode: string;
+  /**
+   * Distance in miles a user has indicated they're willing to travel
+   */
+  travelRadius: number;
+  /**
+   * A FHIR ResearchStudy phase
+   */
+  phase: string;
+  /**
+   * A FHIR ResearchStudy status
+   */
+  recruitmentStatus: string;
+  /**
+   * A set of conditions.
+   */
+  conditions: { code: string; system: string }[] = [];
+  // TO-DO Add any additional fields which need to be extracted from the bundle to construct query
 
-     // TO-DO Add any additional fields which need to be extracted from the bundle to construct query
-
-    constructor(patientBundle: Bundle) {
-      for (const entry of patientBundle.entry) {
-        if (!('resource' in entry)) {
-          // Skip bad entries
-          continue;
-        }
-        const resource = entry.resource;
-        console.log(`Checking resource ${resource.resourceType}`);
-        //Obtain critical search parameters
-        if (resource.resourceType === 'Parameters') {
-          for (const parameter of resource.parameter) {
-            console.log(` - Setting parameter ${parameter.name} to ${parameter.valueString}`);
-            if (parameter.name === 'zipCode') {
-              this.zipCode = parameter.valueString;
-            } else if (parameter.name === 'travelRadius') {
-              this.travelRadius = parseFloat(parameter.valueString);
-            } else if (parameter.name === 'phase') {
-              this.phase = parameter.valueString;
-            } else if (parameter.name === 'recruitmentStatus') {
-              this.recruitmentStatus = parameter.valueString;
-            }
+  /**
+   * Create a new query object.
+   * @param patientBundle the patient bundle to use for field values
+   */
+  constructor(patientBundle: Bundle) {
+    for (const entry of patientBundle.entry) {
+      if (!('resource' in entry)) {
+        // Skip bad entries
+        continue;
+      }
+      const resource = entry.resource;
+      // Pull out search parameters
+      if (resource.resourceType === 'Parameters') {
+        for (const parameter of resource.parameter) {
+          if (parameter.name === 'zipCode') {
+            this.zipCode = parameter.valueString;
+          } else if (parameter.name === 'travelRadius') {
+            this.travelRadius = parseFloat(parameter.valueString);
+          } else if (parameter.name === 'phase') {
+            this.phase = parameter.valueString;
+          } else if (parameter.name === 'recruitmentStatus') {
+            this.recruitmentStatus = parameter.valueString;
           }
         }
-        // Gather all conditions the patient has
-        if (resource.resourceType === 'Condition') {
-          this.addCondition(resource);
-        }
-        // TO-DO Extract any additional resources that you defined
       }
-    }
-    addCondition(condition: Condition): void {
-      // Should have a code
-      // TODO: Limit to specific coding systems (maybe)
-      for (const code of condition.code.coding) {
-        this.conditions.add(code.code);
+      // Gather all conditions the patient has
+      if (resource.resourceType === 'Condition') {
+        this.addCondition(resource);
       }
-    }
-
-    //TO-DO Utilize the extracted information to create the API query
-
-    /**
-     * Create an api request string
-     * @return {string} the api query
-     */
-    toQuery(): string {
-      const query = ` {}`;
-      return query;
-    }
-
-    toString(): string {
-      return this.toQuery();
+      // TO-DO Extract any additional resources that you defined
     }
   }
 
+  /**
+   * Handle condition data. The default implementation does nothing, your
+   * implementation may pull out specific data.
+   * @param condition the condition to add
+   */
+  addCondition(condition: Condition): void {
+    for (const coding of condition.code.coding) {
+      this.conditions.push(coding);
+    }
+  }
 
-/** Converts patient Bundle (stored within request to server) --> Promise < JSON>
- * @param reqBody The body of the request containing patient bundle data
- */
+  /**
+   * Create the information sent to the server.
+   * @return {string} the api query
+   */
+  toQuery(): QueryRequest {
+    return JSON.stringify({
+      zip: this.zipCode,
+      distance: this.travelRadius,
+      phase: this.phase,
+      status: this.recruitmentStatus,
+      conditions: this.conditions
+    });
+  }
 
-export function getResponse(patientBundle: Bundle): Promise<SearchSet> {
-  return sendQuery((new APIQuery(patientBundle)).toQuery());
-}
-
-export function convertToResearchStudy(json: JsonObject, id: number): ResearchStudy {
-  const result = new ResearchStudy(id);
-  // Add whatever fields can be added here
-  return result;
+  toString(): string {
+    // Note that if toQuery is no longer a string, this will no longer work
+    return this.toQuery();
+  }
 }
 
 /**
- * Convert a JSON response into a search set
+ * Convert a query response into a search set.
  *
- * @param json the JSON that the underlying API replied with
+ * @param response the response object
  */
-export function convertResponseToSearchSet(json: JsonObject): SearchSet {
+export function convertResponseToSearchSet(response: QueryResponse): SearchSet {
   // Our final response
   const studies: ResearchStudy[] = [];
-  // For this example, assume that the JSON contains a single field called
-  // "results" that is an array of objects that describe each matched service.
-  if ('results' in json && Array.isArray(json['results'])) {
-    // For generating IDs
-    let id = 0;
-    for (const trial of json['results']) {
-      if (typeof trial === 'object') {
-        studies.push(convertToResearchStudy(trial as JsonObject, id));
-        id++;
-      } else {
-        // This is an error condition
-      }
+  // For generating IDs
+  let id = 0;
+  for (const trial of response.matchingTrials) {
+    if (isQueryTrial(trial)) {
+      studies.push(convertToResearchStudy(trial, id++));
+    } else {
+      // This trial could not be understood. It can be ignored if that should
+      // happen or raised/logged as an error.
     }
-  } else if ('error' in json && typeof json['error'] === 'string') {
-    // For this example, assume that the API will return an error string in
-    // the error field
   }
   // Generate the final SearchSet
   return new SearchSet(studies);
 }
 
-function sendQuery(query: string): Promise<SearchSet> {
+/**
+ * Helper function to handle actually sending the query.
+ * @param query the query to send
+ */
+function sendQuery(endpoint: string, query: APIQuery, bearerToken: string): Promise<SearchSet> {
   return new Promise((resolve, reject) => {
-    const body = Buffer.from(`{"query":${JSON.stringify(query)}}`, 'utf8');
-    console.log('Running raw query');
-    console.log(query);
-    const request = https.request(environment.api_endpoint, {
+    const body = Buffer.from(query.toQuery(), 'utf8');
+
+    const request = https.request(endpoint, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json; charset=UTF-8',
         'Content-Length': body.byteLength.toString(),
-        'Authorization': 'Bearer ' + environment.AUTH_TOKEN //Potentially needs to be modified ?
+        'Authorization': 'Bearer ' + bearerToken
       }
     }, result => {
       let responseBody = '';
@@ -158,8 +241,10 @@ function sendQuery(query: string): Promise<SearchSet> {
         console.log('Complete');
         if (result.statusCode === 200) {
           const json = JSON.parse(responseBody) as unknown;
-          if (typeof json === 'object') {
-            resolve(convertResponseToSearchSet(json as JsonObject));
+          if (isQueryResponse(json)) {
+            resolve(convertResponseToSearchSet(json));
+          } else if (isQueryErrorResponse(json)) {
+            reject(new APIError(`Error from service: ${json.error}`, result, responseBody));
           } else {
             reject(new Error('Unable to parse response from server'));
           }
