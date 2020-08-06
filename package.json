@@ -2,7 +2,7 @@
   "name": "clinical-trial-matching-service-template",
   "version": "0.1.0",
   "description": "",
-  "main": "server.js",
+  "main": "dist/server.js",
   "repository": {
     "type": "git",
     "url": "https://github.com/mcode/clinical-trial-matching-service-template.git"
@@ -18,7 +18,7 @@
   "author": "",
   "license": "Apache-2.0",
   "dependencies": {
-    "clinical-trial-matching-service": "github:mcode/clinical-trial-matching-service#initial-implementation"
+    "clinical-trial-matching-service": "github:mcode/clinical-trial-matching-service"
   },
   "devDependencies": {
     "@types/express": "^4.17.6",
