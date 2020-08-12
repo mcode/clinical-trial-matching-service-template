@@ -14,7 +14,7 @@ These steps give an overview of steps you need to take to get the template into 
     - Fill out your `QueryResponse` and `QueryTrial` types to match what the service returns.
     - Modify `QueryErrorResponse` and `sendQuery()` to handle errors returned by the service.
 2. Open `src/researchstudy-mapping.ts`. This file contains a single function: `convertToResearchStudy` function, which handles converting individual trials as returned from the underlying service into FHIR ResearchStudy objects. While the stub is small, the bulk of additional code is likely to be in here.
-3. Open `src/server.ts`. This contains the code to start the service, as well as load configuration data. The default is very simplistic, it simply loads configuration via `configFromEnv()` and passes it off to the `createClinicalTrialLookup()` function. The [dotenv-flow](https://github.com/kerimdzhanov/dotenv-flow) package may be useful for loading configuration information from files.
+3. Open `src/server.ts`. This contains the code to start the service, as well as load configuration data. The default is very simplistic, it simply loads configuration via `configFromEnv()` and passes it off to the `createClinicalTrialLookup()` function. The default implementation uses [dotenv-flow](https://github.com/kerimdzhanov/dotenv-flow) to load configuration from local `.env` files - see the dotenv-flow documentation for more details about how it decides which files and in what order to load from. It may be worth changing the environment variable used to set the environment (defaults to `NODE_ENV`) and the default environment that is used (defaults to `"development"`).
 
 You may need to further tweek the code stubs provided, and there are other ways to implement a service implemenation. (For example, you could simply extend `ClinicalTrialMatchingService` and pass it a matcher that invokes a method on the generated class.) However the steps above should provide the basic stubs necessary to generate an implementation of a matching service.
 
@@ -30,8 +30,6 @@ The ResearchStudy object passed back by this server must be [FHIR-compliant] (ht
 - Inclusion/ Exclusion criteria
 
 # Running the Server
-
-Note that at present, two environment variables must be set before the server will start: `MATCHING_SERVICE_ENDPOINT` and `MATCHING_SERVICE_AUTH_TOKEN`. If neither are set, the service will raise an error.
 
 1. Run `npm install`
 2. Run `npm start`
