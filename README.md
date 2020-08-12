@@ -1,4 +1,5 @@
 # clinical-trial-matching-service-template
+
 Template which streamlines the process of writing a server for clinical trial matching system.
 
 For more information on the architecture and data schemas of the clinical trial matching system, please visit the clinical-trial-matching-engine [wiki](https://github.com/mcode/clinical-trial-matching-engine/wiki).
@@ -19,8 +20,7 @@ You may need to further tweek the code stubs provided, and there are other ways 
 
 # Requirements
 
-The ResearchStudy object passed back by this server must be [FHIR-compliant] (https://www.hl7.org/fhir/researchstudy.html) and satisfy several requirements.
-Study must contain:
+The ResearchStudy object passed back by this server must be [FHIR-compliant] (https://www.hl7.org/fhir/researchstudy.html) and satisfy several requirements. It must contain:
 - Title
 - Summary
 - Site location
@@ -39,9 +39,11 @@ Note that at present, two environment variables must be set before the server wi
 
 # Testing
 
-A validation test is provided to validate the ResearchStudy created via this service. Put an example response object in `spec/data/trial_object.json` and this object will be loaded and validated within this test. For this test to run, you must:
+A validation test is provided to validate the ResearchStudy created via this service. Put an example response object in `spec/data/trial_object.json` and this object will be loaded and validated by the test in `spec/validate.spec.ts`.
 
-1. Have a Java runtime environment installed
-2. [Download a copy of the HL7 validator JAR] (https://storage.googleapis.com/ig-build/org.hl7.fhir.validator.jar) into `spec/data/org.hl7.fhir.validator.jar`
-3. Have properly filled out `spec/data/trial_object.json`
-4. Have implemented the conversion function in `src/researchstudy-mapping.ts`
+For this test to produce meaningful results, you must have:
+
+1. Placed appropriate test data in `spec/data/trial_object.json` (the default is an empty object)
+2. Properly implemented `convertToResearchStudy` in `src/researchstudy-mapping.ts`
+
+The test will always output any messages from the FHIR validator, even if the result is valid, so you may see warning messages displayed in the test output.

@@ -8,7 +8,8 @@ import { QueryTrial } from './query';
 
 export function convertToResearchStudy(json: QueryTrial, id: number): ResearchStudy {
   const result = new ResearchStudy(id);
-  // Add whatever fields can be added here
+  // Add whatever fields can be added here, for example:
+  result.status = 'active';
   return result;
 }
 
