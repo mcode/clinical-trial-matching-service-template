@@ -2,7 +2,7 @@ import { QueryTrial } from '../src/query';
 import convertToResearchStudy from '../src/researchstudy-mapping';
 
 import fs from 'fs';
-import path, { format } from 'path';
+import path from 'path';
 
 // The 'fhir' module is missing types for some reason, despite being written in TypeScript
 import { Fhir } from 'fhir/fhir';
