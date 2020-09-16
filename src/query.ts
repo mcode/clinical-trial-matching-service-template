@@ -4,7 +4,7 @@
  */
 import https from 'https';
 import { IncomingMessage } from 'http';
-import { Bundle, ServiceConfiguration, Condition, ResearchStudy, SearchSet } from 'clinical-trial-matching-service';
+import { fhir, ServiceConfiguration, ResearchStudy, SearchSet } from 'clinical-trial-matching-service';
 import convertToResearchStudy from './researchstudy-mapping';
 
 export interface QueryConfiguration extends ServiceConfiguration {
@@ -16,7 +16,7 @@ export interface QueryConfiguration extends ServiceConfiguration {
  * Create a new matching function using the given configuration.
  * @param configuration the configuration to use to configure the matcher
  */
-export function createClinicalTrialLookup(configuration: QueryConfiguration): (patientBundle: Bundle) => Promise<SearchSet> {
+export function createClinicalTrialLookup(configuration: QueryConfiguration): (patientBundle: fhir.Bundle) => Promise<SearchSet> {
   // Raise errors on missing configuration
   if (typeof configuration.endpoint !== 'string') {
     throw new Error('Missing endpoint in configuration');
@@ -26,7 +26,7 @@ export function createClinicalTrialLookup(configuration: QueryConfiguration): (p
   }
   const endpoint = configuration.endpoint;
   const bearerToken = configuration.auth_token;
-  return function getMatchingClinicalTrials(patientBundle: Bundle): Promise<SearchSet> {
+  return function getMatchingClinicalTrials(patientBundle: fhir.Bundle): Promise<SearchSet> {
     // Create the query based on the patient bundle:
     const query = new APIQuery(patientBundle);
     // And send the query to the server
@@ -135,7 +135,7 @@ export class APIQuery {
    * Create a new query object.
    * @param patientBundle the patient bundle to use for field values
    */
-  constructor(patientBundle: Bundle) {
+  constructor(patientBundle: fhir.Bundle) {
     for (const entry of patientBundle.entry) {
       if (!('resource' in entry)) {
         // Skip bad entries
@@ -169,7 +169,7 @@ export class APIQuery {
    * implementation may pull out specific data.
    * @param condition the condition to add
    */
-  addCondition(condition: Condition): void {
+  addCondition(condition: fhir.Condition): void {
     for (const coding of condition.code.coding) {
       this.conditions.push(coding);
     }
