@@ -293,7 +293,18 @@ function sendQuery(
         result.on("end", () => {
           console.log("Complete");
           if (result.statusCode === 200) {
-            const json = JSON.parse(responseBody) as unknown;
+            let json: unknown;
+            try {
+              json = JSON.parse(responseBody) as unknown;
+            } catch (ex) {
+              reject(
+                new APIError(
+                  "Unable to parse response as JSON",
+                  result,
+                  responseBody
+                )
+              );
+            }
             if (isQueryResponse(json)) {
               resolve(convertResponseToSearchSet(json, ctgService));
             } else if (isQueryErrorResponse(json)) {
