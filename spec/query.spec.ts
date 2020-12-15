@@ -3,12 +3,19 @@
  * results.
  */
 
-import { fhir } from "clinical-trial-matching-service";
+import {
+  ClinicalTrialGovService,
+  fhir,
+  ResearchStudy,
+} from "clinical-trial-matching-service";
 import createClinicalTrialLookup, {
+  convertResponseToSearchSet,
   isQueryTrial,
   isQueryResponse,
   isQueryErrorResponse,
   APIQuery,
+  QueryResponse,
+  QueryTrial,
 } from "../src/query";
 import nock from "nock";
 
@@ -224,6 +231,57 @@ describe("APIQuery", () => {
     bundle.entry.push(({ invalid: true } as unknown) as fhir.BundleEntry);
     new APIQuery(bundle);
     // Passing is not raising an exception
+  });
+});
+
+describe("convertResponseToSearchSet()", () => {
+  it("converts trials", () => {
+    return expectAsync(
+      convertResponseToSearchSet({
+        matchingTrials: [{ name: "test" }],
+      }).then((searchSet) => {
+        expect(searchSet.entry.length).toEqual(1);
+        expect(searchSet.entry[0].resource).toBeInstanceOf(ResearchStudy);
+        expect(
+          (searchSet.entry[0].resource as fhir.ResearchStudy).status
+        ).toEqual("active");
+      })
+    ).toBeResolved();
+  });
+
+  it("skips invalid trials", () => {
+    const response: QueryResponse = {
+      matchingTrials: [],
+    };
+    // Push on an invalid object
+    response.matchingTrials.push(({
+      invalidObject: true,
+    } as unknown) as QueryTrial);
+    return expectAsync(convertResponseToSearchSet(response)).toBeResolved();
+  });
+
+  it("uses the backup service if provided", () => {
+    // Note that we don't initialize the backup service so no files are created
+    const backupService = new ClinicalTrialGovService("temp");
+    // Instead we install a spy that takes over "updating" the research studies
+    // by doing nothing
+    const spy = spyOn(backupService, "updateResearchStudies").and.callFake(
+      (studies) => {
+        return Promise.resolve(studies);
+      }
+    );
+    return expectAsync(
+      convertResponseToSearchSet(
+        {
+          matchingTrials: [{ name: "test" }],
+        },
+        backupService
+      )
+    )
+      .toBeResolved()
+      .then(() => {
+        expect(spy).toHaveBeenCalled();
+      });
   });
 });
 

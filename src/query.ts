@@ -75,7 +75,7 @@ export function isQueryTrial(o: unknown): o is QueryTrial {
 }
 
 // Generic type for the response data being received from the server.
-interface QueryResponse extends Record<string, unknown> {
+export interface QueryResponse extends Record<string, unknown> {
   matchingTrials: QueryTrial[];
 }
 
@@ -94,7 +94,7 @@ export function isQueryResponse(o: unknown): o is QueryResponse {
   return Array.isArray((o as QueryResponse).matchingTrials);
 }
 
-interface QueryErrorResponse extends Record<string, unknown> {
+export interface QueryErrorResponse extends Record<string, unknown> {
   error: string;
 }
 
