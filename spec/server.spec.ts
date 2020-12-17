@@ -11,6 +11,7 @@ describe("startServer()", () => {
       return null;
     });
   });
+
   it("starts the server", () => {
     return expectAsync(startServer()).toBeResolved();
   });
@@ -23,12 +24,10 @@ describe("startServer()", () => {
         auth_token: "fake",
         host: "127.0.0.1",
         port: 0,
+      }).then((service) => {
+        expect(service.host).toEqual("127.0.0.1");
+        expect(service.port).toEqual(0);
       })
-        .then((service) => {
-          expect(service.host).toEqual("127.0.0.1");
-          expect(service.port).toEqual(0);
-        })
-        .catch((error) => console.error(error))
     ).toBeResolved();
   });
 });

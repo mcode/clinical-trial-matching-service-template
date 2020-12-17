@@ -12,7 +12,7 @@ describe('FHIR Validation', () => {
   const fhir = new Fhir();
 
   it('converting result to ResearchStudy produces a valid FHIR object', function () {
-    return new Promise((resolve, reject) => {
+    return new Promise<void>((resolve, reject) => {
       fs.readFile(path.resolve(__dirname, '../../spec/data/trial_object.json'), { encoding: 'utf8' }, (error, data) => {
         if (error) {
           reject(error);

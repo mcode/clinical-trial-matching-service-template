@@ -50,7 +50,7 @@ export default async function startServer(
     getMatchingClinicalTrials,
     configuration
   );
-  service.listen();
+  await service.listen();
   return service;
 }
 
