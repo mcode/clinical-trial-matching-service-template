@@ -4,11 +4,15 @@
 
 # Ignore built files
 /dist
+/dist-spec
 
 # Ignore installed modules
 /node_modules
-spec/data/org.hl7.fhir.validator.jar
-/src/AllPublicXML
+
+# Ignore test files
+/.nyc_output
+/coverage
+
 # System Files
 .DS_Store
 Thumbs.db
