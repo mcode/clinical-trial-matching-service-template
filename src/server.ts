@@ -53,13 +53,3 @@ export default async function startServer(
   await service.listen();
   return service;
 }
-
-/* istanbul ignore next: only can be run directly */
-if (require.main === module) {
-  // A then() could also be added to do any necessary post-startup tasks, but
-  // for now, all this does is handle any errors
-  startServer().catch((error) => {
-    console.error("Unable to start server: %s", error);
-    console.error(error);
-  });
-}
