@@ -6,7 +6,7 @@ import https from "https";
 import { IncomingMessage } from "http";
 import {
   fhir,
-  ClinicalTrialGovService,
+  ClinicalTrialsGovService,
   ServiceConfiguration,
   ResearchStudy,
   SearchSet,
@@ -28,7 +28,7 @@ export interface QueryConfiguration extends ServiceConfiguration {
  */
 export function createClinicalTrialLookup(
   configuration: QueryConfiguration,
-  ctgService?: ClinicalTrialGovService
+  ctgService?: ClinicalTrialsGovService
 ): (patientBundle: fhir.Bundle) => Promise<SearchSet> {
   // Raise errors on missing configuration
   if (typeof configuration.endpoint !== "string") {
@@ -229,7 +229,7 @@ export class APIQuery {
  */
 export function convertResponseToSearchSet(
   response: QueryResponse,
-  ctgService?: ClinicalTrialGovService
+  ctgService?: ClinicalTrialsGovService
 ): Promise<SearchSet> {
   // Our final response
   const studies: ResearchStudy[] = [];
@@ -270,7 +270,7 @@ function sendQuery(
   endpoint: string,
   query: APIQuery,
   bearerToken: string,
-  ctgService?: ClinicalTrialGovService
+  ctgService?: ClinicalTrialsGovService
 ): Promise<SearchSet> {
   return new Promise((resolve, reject) => {
     const body = Buffer.from(query.toQuery(), "utf8");
