@@ -22,7 +22,7 @@ You may need to further tweek the code stubs provided, and there are other ways 
 
 # Requirements
 
-The ResearchStudy object passed back by this server must be [FHIR-compliant] (https://www.hl7.org/fhir/researchstudy.html) and satisfy several requirements. It must contain:
+The ResearchStudy object passed back by this server must be [FHIR-compliant](https://www.hl7.org/fhir/researchstudy.html) and satisfy several requirements. It must contain:
 - Title
 - Summary
 - Site location
