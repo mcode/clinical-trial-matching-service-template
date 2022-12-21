@@ -3,10 +3,11 @@
  * results.
  */
 
+import { Bundle, BundleEntry } from "fhir/r4";
 import {
   ClinicalTrialsGovService,
-  fhir,
   ResearchStudy,
+  SearchSet,
 } from "clinical-trial-matching-service";
 import createClinicalTrialLookup, {
   convertResponseToSearchSet,
@@ -132,6 +133,10 @@ describe("APIQuery", () => {
         {
           resource: {
             resourceType: "Condition",
+            subject: {
+              type: "Patient",
+              reference: "urn:patient/1"
+            },
             code: {
               coding: [
                 {
@@ -145,6 +150,10 @@ describe("APIQuery", () => {
         {
           resource: {
             resourceType: "Condition",
+            subject: {
+              type: "Patient",
+              reference: "urn:patient/1"
+            },
             code: {
               coding: [
                 {
@@ -222,13 +231,13 @@ describe("APIQuery", () => {
 
   it("ignores invalid entries", () => {
     // Passing in this case is simply "not raising an exception"
-    const bundle: fhir.Bundle = {
+    const bundle: Bundle = {
       resourceType: "Bundle",
       type: "collection",
       entry: [],
     };
     // Force an invalid entry in
-    bundle.entry.push(({ invalid: true } as unknown) as fhir.BundleEntry);
+    bundle.entry?.push(({ invalid: true } as unknown) as BundleEntry);
     new APIQuery(bundle);
     // Passing is not raising an exception
   });
@@ -243,7 +252,7 @@ describe("convertResponseToSearchSet()", () => {
         expect(searchSet.entry.length).toEqual(1);
         expect(searchSet.entry[0].resource).toBeInstanceOf(ResearchStudy);
         expect(
-          (searchSet.entry[0].resource as fhir.ResearchStudy).status
+          searchSet.entry[0].resource?.status
         ).toEqual("active");
       })
     ).toBeResolved();
@@ -287,12 +296,12 @@ describe("convertResponseToSearchSet()", () => {
 
 describe("ClinicalTrialLookup", () => {
   // A valid patient bundle for the matcher, passed to ensure a query is generated
-  const patientBundle: fhir.Bundle = {
+  const patientBundle: Bundle = {
     resourceType: "Bundle",
     type: "batch",
     entry: [],
   };
-  let matcher: (patientBundle: fhir.Bundle) => Promise<fhir.SearchSet>;
+  let matcher: (patientBundle: Bundle) => Promise<SearchSet>;
   let scope: nock.Scope;
   let mockRequest: nock.Interceptor;
   beforeEach(() => {

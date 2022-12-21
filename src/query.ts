@@ -4,8 +4,8 @@
  */
 import https from "https";
 import { IncomingMessage } from "http";
+import { Bundle, Coding, Condition } from "fhir/r4";
 import {
-  fhir,
   ClinicalTrialsGovService,
   ServiceConfiguration,
   ResearchStudy,
@@ -29,7 +29,7 @@ export interface QueryConfiguration extends ServiceConfiguration {
 export function createClinicalTrialLookup(
   configuration: QueryConfiguration,
   ctgService?: ClinicalTrialsGovService
-): (patientBundle: fhir.Bundle) => Promise<SearchSet> {
+): (patientBundle: Bundle) => Promise<SearchSet> {
   // Raise errors on missing configuration
   if (typeof configuration.endpoint !== "string") {
     throw new Error("Missing endpoint in configuration");
@@ -40,7 +40,7 @@ export function createClinicalTrialLookup(
   const endpoint = configuration.endpoint;
   const bearerToken = configuration.auth_token;
   return function getMatchingClinicalTrials(
-    patientBundle: fhir.Bundle
+    patientBundle: Bundle
   ): Promise<SearchSet> {
     // Create the query based on the patient bundle:
     const query = new APIQuery(patientBundle);
@@ -152,14 +152,14 @@ export class APIQuery {
   /**
    * A set of conditions.
    */
-  conditions: { code: string; system: string }[] = [];
+  conditions: Coding[] = [];
   // TO-DO Add any additional fields which need to be extracted from the bundle to construct query
 
   /**
    * Create a new query object.
    * @param patientBundle the patient bundle to use for field values
    */
-  constructor(patientBundle: fhir.Bundle) {
+  constructor(patientBundle: Bundle) {
     for (const entry of patientBundle.entry) {
       if (!("resource" in entry)) {
         // Skip bad entries
@@ -193,7 +193,7 @@ export class APIQuery {
    * implementation may pull out specific data.
    * @param condition the condition to add
    */
-  addCondition(condition: fhir.Condition): void {
+  addCondition(condition: Condition): void {
     for (const coding of condition.code.coding) {
       this.conditions.push(coding);
     }
