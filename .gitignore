@@ -16,3 +16,6 @@
 # System Files
 .DS_Store
 Thumbs.db
+
+# Ignore CTGov cache
+/ctgov-cache
