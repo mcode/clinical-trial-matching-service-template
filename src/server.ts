@@ -6,7 +6,6 @@ import ClinicalTrialMatchingService, {
   createClinicalTrialsGovService,
 } from "clinical-trial-matching-service";
 import * as dotenv from "dotenv-flow";
-import * as path from "path";
 
 /**
  * Exports a function to start the server. This is also the main entry point -
@@ -37,11 +36,10 @@ export default async function startServer(
     configuration = configFromEnv("MATCHING_SERVICE_");
   }
 
-  // Create a ClinicalTrialGovService. It takes a path to a temporary directory
-  // that is used to store its cache.
-  const ctgService = await createClinicalTrialsGovService(
-    path.resolve(__dirname, "../ctgov-cache")
-  );
+  // Create a ClinicalTrialGovService. It takes a path to a SQLite database
+  // that serves as the cache.
+  const ctgFile: string | undefined = process.env['CTGOV_CACHE_FILE'];
+  const ctgService = ctgFile && await createClinicalTrialsGovService(ctgFile);
   const getMatchingClinicalTrials = createClinicalTrialLookup(
     configuration,
     ctgService
