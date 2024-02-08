@@ -107,11 +107,6 @@ export function isQueryErrorResponse(o: unknown): o is QueryErrorResponse {
   return typeof (o as QueryErrorResponse).error === "string";
 }
 
-// Generic type that represents a JSON object - that is, an object parsed from
-// JSON. Note that the return value from JSON.parse is an any, this does not
-// represent that.
-type JsonObject = Record<string, unknown>;
-
 // API RESPONSE SECTION
 export class APIError extends Error {
   constructor(
