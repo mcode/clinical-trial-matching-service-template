@@ -18,4 +18,4 @@
 Thumbs.db
 
 # Ignore CTGov cache
-/ctgov-cache
+/ctgov-cache.db
